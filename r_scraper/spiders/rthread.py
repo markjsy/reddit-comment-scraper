@@ -6,29 +6,35 @@ from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from scrapy_splash import SplashRequest
 
-# CHANGE ME
-reddit_url = "https://www.reddit.com/r/todayilearned/comments/6hurma/til_instead_of_donating_money_toyota_helped_the/"
-reddit_sub = 'todayilearned'
+############
+# CHANGE ME#
+############
+reddit_url = "https://www.reddit.com/r/politics/comments/6hw8b3/six_people_have_resigned_from_trumps_hivaids/"
+reddit_sub = 'politics'
+path_to_output = ""
 
-# strips tags from scraped data
+import csv
+
+# encodes and strips tags from scraped data
 def stripper(raw_html):
     cleantext = re.sub('<.*?>', '', raw_html)
     cleanertext = re.sub("\n",'', cleantext)
+    cleanertext = cleanertext.encode('ascii', 'ignore').decode('ascii')
     return cleanertext
 
 def strip_points(text):
-	cleantext = ""
-	if text == " points":
-		cleantext = re.sub(' points', '', text)
-	else:
-		cleantext = re.sub(' point', '', text)
-
-	return cleantext
+    cleantext = ""
+    if text == " points":
+        cleantext = re.sub(' points', '', text)
+    else:
+        cleantext = re.sub(' point', '', text)
+    cleantext = cleantext.encode('ascii', 'ignore').decode('ascii')
+    return cleantext
 
 class RthreadSpider(scrapy.Spider):
     name = "rthread"
     allowed_domains = ["reddit.com"]
-    start_urls = ['https://www.reddit.com/']
+    start_urls = ['https://www.reddit.com/r/'+reddit_sub]
 
     def parse(self, response):
         hdr = { 'User-Agent' : 'My Agent'}
@@ -46,13 +52,11 @@ class RthreadSpider(scrapy.Spider):
                 splash:wait(1)
               end
 
-        	    splash:wait(60)
-
               return {
                html = splash:html(),
               }
             end
-		"""
+        """
 
         link = LinkExtractor( allow=['('+ reddit_url + ')'] )
         for link in link.extract_links(response):
@@ -67,7 +71,7 @@ class RthreadSpider(scrapy.Spider):
                 })
 
     def parse_link(self, response):
-    	# the really hard stuff -- Xpath queries optimized for Reddit
+        # the really hard stuff -- Xpath queries optimized for Reddit
         time_list = response.xpath('//div[@class="commentarea"]//p[@class="tagline"]/time[position()=1]/@datetime').extract()        
         score_list = response.xpath('//div[@class="commentarea"]//p[@class="tagline"]/span[contains(@class, "score") and contains(@class, "unvoted")]|//div[@class="commentarea"]//p[@class="tagline"]/span[contains(@class, "score-hidden")]|//div[@class="commentarea"]//p[@class="tagline"]/following-sibling::div//div[contains(@class, "usertext")]/div[@class="md"]').extract()
         comment_list = response.xpath('//div[@class="commentarea"]//p[@class="tagline"]/following-sibling::form//div[contains(@class, "usertext-body")]/div[@class="md"]|//div[@class="commentarea"]//p[@class="tagline"]/following-sibling::div//div[contains(@class, "usertext")]/div[@class="md"]').extract()
@@ -82,13 +86,16 @@ class RthreadSpider(scrapy.Spider):
         	stripped_time.append(stripper(time_list[i]))
         	stripped_score.append(strip_points(stripper(score_list[i])))
         	stripped_comment.append(stripper(comment_list[i]))
-        	
-        # CHANGE ME -- DATAPIPE LINE OR OUTPUT 
-        for i in range(0, len(time_list)):
-        	print(stripped_time[i], "-*-", stripped_score[i], "-*-", stripped_comment[i])
 
+        #######################################	
+        # CHANGE ME -- DATAPIPE LINE OR OUTPUT#
+        #######################################
 
-
-
-
+        with open(path_to_output, 'w') as outcsv:   
+            #configure writer to write standard csv file
+            writer = csv.writer(outcsv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
+            writer.writerow(['url', 'subreddit', 'date', 'score', 'comment'])
+            
+            for i in range(0, len(stripped_time)):
+                writer.writerow([ reddit_url, reddit_sub, stripped_time[i], stripped_score[i], stripped_comment[i] ])
 
