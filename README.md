@@ -20,10 +20,14 @@ Fast reddit comment scraper. Handles dynamic comment loading.
   docker run -p 8050:8050 scrapinghub/splash
   ```
   
-## How to run
+## Use
   1. Go into spiders folder and edit *rthread.py* 
   2. Change *reddit_url* and *reddit_sub* at the top
   3. Change the bottom to your data pipeline or output to desired format
+  4. Run on command line:
+  ```
+  scrapy crawl rthread
+  ```
   
 
   
