@@ -1,5 +1,5 @@
 # reddit-comment-scraper
-Fast reddit comment scraper. Handles dynamic comment loading.
+Fast asynchronous reddit comment scraper. Handles dynamic comment loading.
 
 
 ## Installation
