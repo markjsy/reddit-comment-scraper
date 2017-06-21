@@ -16,8 +16,8 @@ Fast asynchronous reddit comment scraper. Handles dynamic comment loading.
   
 ## Use
   1. Go into spiders folder and edit *rthread.py* 
-  2. Change *reddit_url* and *reddit_sub* at the top
-  3. Change the bottom to your data pipeline or output to desired format (Default is CSV)
+  2. Change *reddit_url* , *reddit_sub* and *output_path* at the top
+  3. (Optional) Change the bottom to pipeline to your database. [Default ouput CSV]
   4. Run on command line:
   ```
   scrapy crawl rthread
