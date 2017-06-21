@@ -23,5 +23,11 @@ Fast asynchronous reddit comment scraper. Handles dynamic comment loading.
   scrapy crawl rthread
   ```
   
-
+## Advance Usage
+  * The *reddit_url* variable can use regular expressions to scrape comments. Example:
+  ```
+  reddit_url = "reddit/r/politics/comments/w+\/w+"
+  subreddit = "/r/politics"
+  ```
+  This will use https://www.reddit.com/r/politics as the starting point for the Scrapy spider, and it will look for every link that has the pattern https://www.reddit.com/r/politics/comments/sometext/sometext. This will allow you to scrape every single comment thread on the first page of */r/politics*
   
